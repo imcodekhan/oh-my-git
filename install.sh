@@ -3,62 +3,62 @@
 # Oh-My-Git installation script
 # This script installs Oh-My-Git in the user's environment
 
-# Define the repository URL and the installation directory
+set -e  # Exit on error
+
+# Define constants
 REPO_URL="https://github.com/imcodekhan/oh-my-git.git"
 INSTALL_DIR="$HOME/.oh-my-git"
 
-# Function to detect shell configuration file
+# Detect shell configuration file
 get_shell_rc_file() {
-  if [ -n "$ZSH_VERSION" ]; then
-    echo "$HOME/.zshrc"
-  else
-    echo "$HOME/.bashrc"
-  fi
+    if [ -n "$ZSH_VERSION" ]; then
+        echo "$HOME/.zshrc"
+    else
+        echo "$HOME/.bashrc"
+    fi
 }
 
-# Check if Git is installed
-if ! command -v git &> /dev/null
-then
-    echo "Git is not installed. Please install Git first."
+# Check Git installation
+if ! command -v git &> /dev/null; then
+    echo "Error: Git is not installed. Please install Git first."
     exit 1
 fi
 
-# Clone the repository into the installation directory
-echo "Cloning Oh-My-Git repository from $REPO_URL..."
-git clone "$REPO_URL" "$INSTALL_DIR"
+# Remove existing installation if present
+if [ -d "$INSTALL_DIR" ]; then
+    echo "Removing existing installation..."
+    rm -rf "$INSTALL_DIR"
+fi
 
-# Check if cloning was successful
-if [ $? -eq 0 ]; then
-    echo "Installation successful."
-else
-    echo "Installation failed."
+# Clone repository
+echo "Cloning Oh-My-Git repository..."
+if ! git clone "$REPO_URL" "$INSTALL_DIR"; then
+    echo "Error: Installation failed"
     exit 1
 fi
 
-# Detect shell configuration file
+# Setup shell configuration
 SHELL_RC_FILE=$(get_shell_rc_file)
+SOURCE_LINE="source $INSTALL_DIR/oh-my-git.sh"
+ALIAS_LINE="alias omg='oh-my-git'"
 
-# Check if Oh-My-Git is already sourced
-if grep -q "source $INSTALL_DIR/oh-my-git.sh" "$SHELL_RC_FILE"; then
-    echo "Oh-My-Git is already sourced in your $SHELL_RC_FILE."
-else
-    # Add source command to shell config file
-    echo "Adding Oh-My-Git setup to $SHELL_RC_FILE..."
-    echo "source $INSTALL_DIR/oh-my-git.sh" >> "$SHELL_RC_FILE"
+# Add source command if not present
+if ! grep -q "$SOURCE_LINE" "$SHELL_RC_FILE"; then
+    echo "Adding Oh-My-Git to $SHELL_RC_FILE..."
+    echo -e "\n# Oh-My-Git configuration" >> "$SHELL_RC_FILE"
+    echo "$SOURCE_LINE" >> "$SHELL_RC_FILE"
 fi
 
-# Check if alias is already set
-if grep -q "alias omg='oh-my-git'" "$SHELL_RC_FILE"; then
-    echo "Alias 'omg' is already set in your $SHELL_RC_FILE."
-else
-    # Add alias for omg
-    echo "Adding alias 'omg' to $SHELL_RC_FILE..."
-    echo "alias omg='oh-my-git'" >> "$SHELL_RC_FILE"
+# Add alias if not present
+if ! grep -q "$ALIAS_LINE" "$SHELL_RC_FILE"; then
+    echo "Adding alias 'omg'..."
+    echo "$ALIAS_LINE" >> "$SHELL_RC_FILE"
 fi
 
-# Reload shell configuration
-echo "Reloading your shell configuration..."
-source "$SHELL_RC_FILE"
+# Attempt to reload shell configuration
+if [ -f "$SHELL_RC_FILE" ]; then
+    source "$SHELL_RC_FILE" 2>/dev/null || true
+fi
 
-echo "Oh-My-Git has been installed successfully!"
-echo "You may need to restart your terminal for all changes to take effect."
+echo "✨ Oh-My-Git installed successfully!"
+echo "🔄 Please restart your terminal or run: source $SHELL_RC_FILE"

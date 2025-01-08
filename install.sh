@@ -10,14 +10,14 @@ REPO_URL="https://github.com/imcodekhan/oh-my-git.git"
 INSTALL_DIR="$HOME/.oh-my-git"
 OH_MY_GIT_FILE="$INSTALL_DIR/oh-my-git.sh"
 
-# Detect shell configuration file
-get_shell_rc_file() {
-    if [ -n "$ZSH_VERSION" ]; then
-        echo "$HOME/.zshrc"
-    else
-        echo "$HOME/.bashrc"
-    fi
-}
+# Detect shell configuration files
+SHELL_RC_FILES=()
+if [ -f "$HOME/.bashrc" ]; then
+    SHELL_RC_FILES+=("$HOME/.bashrc")
+fi
+if [ -f "$HOME/.zshrc" ]; then
+    SHELL_RC_FILES+=("$HOME/.zshrc")
+fi
 
 # Check Git installation
 if ! command -v git &> /dev/null; then
@@ -37,20 +37,23 @@ echo "Making oh-my-git.sh executable..."
 chmod +x "$OH_MY_GIT_FILE"
 
 # Setup shell configuration
-SHELL_RC_FILE=$(get_shell_rc_file)
 ALIAS_LINE="alias omg='$OH_MY_GIT_FILE'"
 
-# Add alias to shell configuration if not present
-if ! grep -q "$ALIAS_LINE" "$SHELL_RC_FILE"; then
-    echo "Adding Oh-My-Git alias to $SHELL_RC_FILE..."
-    echo -e "\n# Oh-My-Git configuration" >> "$SHELL_RC_FILE"
-    echo "$ALIAS_LINE" >> "$SHELL_RC_FILE"
-fi
+# Add alias to shell configuration files
+for SHELL_RC_FILE in "${SHELL_RC_FILES[@]}"; do
+    if ! grep -q "$ALIAS_LINE" "$SHELL_RC_FILE"; then
+        echo "Adding Oh-My-Git alias to $SHELL_RC_FILE..."
+        echo -e "\n# Oh-My-Git configuration" >> "$SHELL_RC_FILE"
+        echo "$ALIAS_LINE" >> "$SHELL_RC_FILE"
+    fi
+done
 
 # Attempt to reload shell configuration
-if [ -f "$SHELL_RC_FILE" ]; then
-    source "$SHELL_RC_FILE" 2>/dev/null || true
-fi
+for SHELL_RC_FILE in "${SHELL_RC_FILES[@]}"; do
+    if [ -f "$SHELL_RC_FILE" ]; then
+        source "$SHELL_RC_FILE" 2>/dev/null || true
+    fi
+done
 
 echo "✨ Oh-My-Git installed successfully!"
 echo "🔄 Please restart your terminal or run: source $SHELL_RC_FILE"

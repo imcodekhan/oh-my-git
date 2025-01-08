@@ -8,6 +8,7 @@ set -e  # Exit on error
 # Define constants
 REPO_URL="https://github.com/imcodekhan/oh-my-git.git"
 INSTALL_DIR="$HOME/.oh-my-git"
+OH_MY_GIT_FILE="$INSTALL_DIR/oh-my-git.sh"
 
 # Detect shell configuration file
 get_shell_rc_file() {
@@ -24,12 +25,6 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
-# Remove existing installation if present
-if [ -d "$INSTALL_DIR" ]; then
-    echo "Removing existing installation..."
-    rm -rf "$INSTALL_DIR"
-fi
-
 # Clone repository
 echo "Cloning Oh-My-Git repository..."
 if ! git clone "$REPO_URL" "$INSTALL_DIR"; then
@@ -37,9 +32,13 @@ if ! git clone "$REPO_URL" "$INSTALL_DIR"; then
     exit 1
 fi
 
+# Make the oh-my-git.sh file executable
+echo "Making oh-my-git.sh executable..."
+chmod +x "$OH_MY_GIT_FILE"
+
 # Setup shell configuration
 SHELL_RC_FILE=$(get_shell_rc_file)
-SOURCE_LINE="source $INSTALL_DIR/oh-my-git.sh"
+SOURCE_LINE="source $OH_MY_GIT_FILE"
 ALIAS_LINE="alias omg='oh-my-git'"
 
 # Add source command if not present

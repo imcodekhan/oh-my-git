@@ -38,19 +38,12 @@ chmod +x "$OH_MY_GIT_FILE"
 
 # Setup shell configuration
 SHELL_RC_FILE=$(get_shell_rc_file)
-SOURCE_LINE="source $OH_MY_GIT_FILE"
-ALIAS_LINE="alias omg='oh-my-git'"
+ALIAS_LINE="alias omg='$OH_MY_GIT_FILE'"
 
-# Add source command if not present
-if ! grep -q "$SOURCE_LINE" "$SHELL_RC_FILE"; then
-    echo "Adding Oh-My-Git to $SHELL_RC_FILE..."
-    echo -e "\n# Oh-My-Git configuration" >> "$SHELL_RC_FILE"
-    echo "$SOURCE_LINE" >> "$SHELL_RC_FILE"
-fi
-
-# Add alias if not present
+# Add alias to shell configuration if not present
 if ! grep -q "$ALIAS_LINE" "$SHELL_RC_FILE"; then
-    echo "Adding alias 'omg'..."
+    echo "Adding Oh-My-Git alias to $SHELL_RC_FILE..."
+    echo -e "\n# Oh-My-Git configuration" >> "$SHELL_RC_FILE"
     echo "$ALIAS_LINE" >> "$SHELL_RC_FILE"
 fi
 

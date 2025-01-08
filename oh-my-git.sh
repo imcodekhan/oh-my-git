@@ -36,7 +36,6 @@ case "$1 $2" in
     fi
     ;;
   *)
-    echo "Error: Command not recognized."
     show_help
     ;;
 esac

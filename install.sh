@@ -69,4 +69,9 @@ for SHELL_RC_FILE in "${SHELL_RC_FILES[@]}"; do
 done
 
 echo "✨ Oh-My-Git is installed and up-to-date!"
-echo "🔄 Please restart your terminal or run: source $SHELL_RC_FILE"
+
+if [ -n "${SHELL_RC_FILES[0]}" ]; then
+    echo "🔄 Please restart your terminal or run: source ${SHELL_RC_FILES[0]}"
+else
+    echo "⚠️ Unable to detect your shell configuration file. Please manually add the alias to your shell config."
+fi

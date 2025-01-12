@@ -30,7 +30,14 @@ if [ -d "$INSTALL_DIR" ]; then
     echo "Oh-My-Git is already installed."
     echo "Updating Oh-My-Git..."
     if cd "$INSTALL_DIR"; then
-        git pull origin master || { echo "Error: Failed to update Oh-My-Git."; exit 1; }
+        # Fetch the default branch dynamically
+        DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | awk '{print $NF}')
+        if [ -n "$DEFAULT_BRANCH" ]; then
+            git pull origin "$DEFAULT_BRANCH" || { echo "Error: Failed to update Oh-My-Git."; exit 1; }
+        else
+            echo "Error: Unable to determine the default branch."
+            exit 1
+        fi
     else
         echo "Error: Failed to access the installation directory."
         exit 1

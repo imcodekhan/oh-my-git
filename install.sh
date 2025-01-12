@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Oh-My-Git installation script
-# This script installs Oh-My-Git in the user's environment
+# This script installs or updates Oh-My-Git in the user's environment
 
 set -e  # Exit on error
 
@@ -25,15 +25,27 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
-# Clone repository
-echo "Cloning Oh-My-Git repository..."
-if ! git clone "$REPO_URL" "$INSTALL_DIR"; then
-    echo "Error: Installation failed"
-    exit 1
+# Handle existing installation
+if [ -d "$INSTALL_DIR" ]; then
+    echo "Oh-My-Git is already installed."
+    echo "Updating Oh-My-Git..."
+    if cd "$INSTALL_DIR"; then
+        git pull origin main || { echo "Error: Failed to update Oh-My-Git."; exit 1; }
+    else
+        echo "Error: Failed to access the installation directory."
+        exit 1
+    fi
+else
+    # Clone repository
+    echo "Cloning Oh-My-Git repository..."
+    if ! git clone "$REPO_URL" "$INSTALL_DIR"; then
+        echo "Error: Installation failed."
+        exit 1
+    fi
 fi
 
 # Make the oh-my-git.sh file executable
-echo "Making oh-my-git.sh executable..."
+echo "Ensuring oh-my-git.sh is executable..."
 chmod +x "$OH_MY_GIT_FILE"
 
 # Setup shell configuration
@@ -41,7 +53,7 @@ ALIAS_LINE="alias omg='$OH_MY_GIT_FILE'"
 
 # Add alias to shell configuration files
 for SHELL_RC_FILE in "${SHELL_RC_FILES[@]}"; do
-    if ! grep -q "$ALIAS_LINE" "$SHELL_RC_FILE"; then
+    if ! grep -qF "$ALIAS_LINE" "$SHELL_RC_FILE"; then
         echo "Adding Oh-My-Git alias to $SHELL_RC_FILE..."
         echo -e "\n# Oh-My-Git configuration" >> "$SHELL_RC_FILE"
         echo "$ALIAS_LINE" >> "$SHELL_RC_FILE"
@@ -55,5 +67,5 @@ for SHELL_RC_FILE in "${SHELL_RC_FILES[@]}"; do
     fi
 done
 
-echo "✨ Oh-My-Git installed successfully!"
-echo "🔄 Please restart your terminal or run: source $SHELL_RC_FILE"
+echo "✨ Oh-My-Git is installed and up-to-date!"
+echo "🔄 Please restart your terminal or run: source <your-shell-rc-file>"

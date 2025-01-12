@@ -30,7 +30,7 @@ if [ -d "$INSTALL_DIR" ]; then
     echo "Oh-My-Git is already installed."
     echo "Updating Oh-My-Git..."
     if cd "$INSTALL_DIR"; then
-        git pull origin main || { echo "Error: Failed to update Oh-My-Git."; exit 1; }
+        git pull origin master || { echo "Error: Failed to update Oh-My-Git."; exit 1; }
     else
         echo "Error: Failed to access the installation directory."
         exit 1

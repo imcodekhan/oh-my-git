@@ -75,4 +75,4 @@ for SHELL_RC_FILE in "${SHELL_RC_FILES[@]}"; do
 done
 
 echo "✨ Oh-My-Git is installed and up-to-date!"
-echo "🔄 Please restart your terminal or run: source <your-shell-rc-file>"
+echo "🔄 Please restart your terminal or run: source $SHELL_RC_FILE"
